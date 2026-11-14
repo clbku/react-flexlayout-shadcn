@@ -1,0 +1,8 @@
+/*
+ * The layout chrome lives in the React components as Tailwind utilities (see src/view/*).
+ * The `flexlayout__*` class names are still emitted for the public classNameMapper contract;
+ * consumers must let Tailwind scan this package's output (@source ".../dist") so the utilities
+ * referenced by the portalled/imperative DOM are generated.
+ *
+ * Only the design-token mappings remain here (see ./flexlayout-theme.css).
+ */
