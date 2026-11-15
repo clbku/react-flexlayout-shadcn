@@ -4,6 +4,14 @@
   "description": "A multi-tab docking layout manager for React, ported from flexlayout-react and themed with shadcn/ui design tokens",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clbku/react-flexlayout-shadcn.git"
+  },
+  "homepage": "https://github.com/clbku/react-flexlayout-shadcn#readme",
+  "bugs": {
+    "url": "https://github.com/clbku/react-flexlayout-shadcn/issues"
+  },
   "sideEffects": [
     "**/*.css"
   ],
@@ -34,6 +42,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsup",
+    "prepack": "npm run build",
     "build:demo": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview"
