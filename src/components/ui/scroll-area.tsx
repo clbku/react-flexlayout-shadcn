@@ -21,6 +21,7 @@ interface ScrollAreaProps extends React.ComponentProps<typeof ScrollAreaPrimitiv
 
 function ScrollArea({
   className,
+  style,
   children,
   orientation = "both",
   showScrollbar = true,
@@ -38,7 +39,12 @@ function ScrollArea({
   const vertical = orientation !== "horizontal";
 
   return (
-    <ScrollAreaPrimitive.Root data-slot="scroll-area" className={cn("relative", className)} {...props}>
+    <ScrollAreaPrimitive.Root
+      data-slot="scroll-area"
+      className={cn("relative", className)}
+      style={{ position: undefined, ...style }}
+      {...props}
+    >
       <ScrollAreaPrimitive.Viewport
         ref={viewportRef}
         data-slot="scroll-area-viewport"

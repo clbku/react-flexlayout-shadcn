@@ -646,7 +646,7 @@ const OUTLINE = [
 
 function OutlinePanel() {
   return (
-    <div className="min-h-full p-2">
+    <div className="h-full min-h-full p-2">
       <div className="mb-2 flex items-center gap-2 px-2 py-1">
         <ListTree className="size-3.5 text-muted-foreground" />
         <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">

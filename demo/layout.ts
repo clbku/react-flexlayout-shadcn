@@ -108,7 +108,7 @@ export const initialLayout: IJsonModel = {
               { type: "tab", name: "Notes", component: "notes", pinned: true },
               { type: "tab", name: "Terminal", component: "terminal" },
               { type: "tab", name: "Problems", component: "problems" },
-              { type: "tab", name: "Output", component: "output" },
+              { type: "tab", name: "Output", component: "output", enableScrollbars: false },
             ],
           },
         ],

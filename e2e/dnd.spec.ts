@@ -37,6 +37,21 @@ async function expectDragCleanedUp(page: Page) {
     await expect(page.locator('[data-layout-path="/drag-rectangle"]')).toHaveCount(0);
 }
 
+async function tabContentHeights(page: Page, tabName: string) {
+    return page.evaluate((name) => {
+        const button = Array.from(document.querySelectorAll('[role="tab"]')).find((t) => t.getAttribute("aria-label") === name)!;
+        const panel = document.getElementById(button.getAttribute("aria-controls")!)!;
+        const scrollArea = panel.querySelector('[data-slot="scroll-area"]')!;
+        const content = scrollArea.querySelector(".flexlayout__tab_moveable")!.firstElementChild!;
+        return {
+            panel: panel.getBoundingClientRect().height,
+            scrollArea: scrollArea.getBoundingClientRect().height,
+            content: content.getBoundingClientRect().height,
+            position: getComputedStyle(scrollArea).position,
+        };
+    }, tabName);
+}
+
 test.beforeEach(async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("tab", { name: "Explorer", exact: true })).toBeVisible();
@@ -121,4 +136,20 @@ test("maximize a tabset and restore it", async ({ page }) => {
     await maxButton.click();
     await expect(maxButton).toHaveAttribute("aria-pressed", "false");
     await expect(explorerContainer).toBeVisible();
+});
+
+test("tab content fills its tab in a tabset and a border", async ({ page }) => {
+    for (const name of ["App.tsx", "Outline"]) {
+        await page.getByRole("tab", { name, exact: true }).click();
+        await expect.poll(async () => (await tabContentHeights(page, name)).position).toBe("absolute");
+        const heights = await tabContentHeights(page, name);
+        expect(heights.scrollArea).toBeCloseTo(heights.panel, 1);
+        expect(heights.content).toBeCloseTo(heights.panel, 1);
+    }
+
+    await page.getByRole("tab", { name: "Output", exact: true }).click();
+    await expect.poll(async () => {
+        const heights = await tabContentHeights(page, "Output");
+        return heights.scrollArea - heights.panel;
+    }).toBeCloseTo(0, 1);
 });
