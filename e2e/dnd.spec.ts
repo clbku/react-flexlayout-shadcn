@@ -153,3 +153,34 @@ test("tab content fills its tab in a tabset and a border", async ({ page }) => {
         return heights.scrollArea - heights.panel;
     }).toBeCloseTo(0, 1);
 });
+test("hidden tabs menu renders tab content that needs the app's context", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    const appSet = tabsetWithTab(page, "App.tsx");
+    const overflow = appSet.locator('[data-layout-path$="/button/overflow"]');
+    const addTab = appSet.getByRole("button", { name: "Add tab" });
+    for (let i = 0; i < 30 && !(await overflow.isVisible()); i++) {
+        await addTab.click();
+    }
+    await expect(overflow).toBeVisible();
+
+    await overflow.click();
+    const menu = page.locator('[data-layout-path="/popup-menu"]');
+    await expect(menu).toBeVisible();
+    const items = menu.locator('[role="menuitem"]');
+    await expect(items.first()).toBeVisible();
+    await expect(items.first().locator("svg").first()).toBeVisible();
+    const name = await items.first().getAttribute("aria-label");
+
+    await items.first().click();
+    await expect(menu).toHaveCount(0);
+    await expect(page.locator(".flexlayout__layout_overlay")).toBeHidden();
+    await expect(page.getByRole("tab", { name: name!, exact: true })).toHaveAttribute("aria-selected", "true");
+
+    await overflow.click();
+    await expect(menu).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(menu).toHaveCount(0);
+    await expect(page.locator(".flexlayout__layout_overlay")).toBeHidden();
+    expect(errors).toEqual([]);
+});

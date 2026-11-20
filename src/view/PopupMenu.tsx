@@ -440,7 +440,8 @@ export function showPopupMenu(props: IPopupMenuProps): () => void {
 /**
  * The internal tab-overflow menu, built on the generic {@link PopupMenu}. Renders each hidden tab
  * as a {@link TabButtonStamp}, supports dragging a tab out of the menu, highlights the selected
- * tab, and shows the drag overlay while open (so drag-out works over iframes).
+ * tab, and shows the drag overlay while open (so drag-out works over iframes). It mounts inside the
+ * layout's own React tree, so tab content from onRenderTab keeps the application's context.
  * @internal
  */
 export function showOverflowMenu(
@@ -449,12 +450,11 @@ export function showOverflowMenu(
     items: { index: number; node: TabNode }[],
     onSelect: (item: { index: number; node: TabNode }) => void,
     controller: LayoutController,
-    onHidden?: () => void, // notified when the menu closes, so the trigger can reset aria-expanded
+    onHidden?: () => void,
 ): () => void {
     const cm = controller.getClassName;
     const menuItems: IPopupMenuItem[] = items.map((it) => ({ key: it.node.getId() }));
 
-    // drag-out over embedded iframes needs the overlay covering all windows
     controller.showOverlayOnAllWindows(true);
 
     const renderItem = (item: IPopupMenuItem, i: number, api: IPopupMenuItemApi) => {
@@ -495,11 +495,9 @@ export function showOverflowMenu(
                 }}
                 draggable={true}
                 onDragStart={(event) => {
-                    event.stopPropagation(); // prevent starting a tabset drag as well
+                    event.stopPropagation();
                     controller.getDragDropManager().setDragNode(event.nativeEvent, it.node);
                 }}
-                // the menu stays open for the duration of the drag: unmounting the drag source would
-                // suppress its dragend, leaving the drag state set and hijacking the next drag
                 onDragEnd={() => {
                     controller.getDragDropManager().onDragEnded();
                     api.close();
@@ -511,25 +509,39 @@ export function showOverflowMenu(
         );
     };
 
-    return showPopupMenu({
-        anchor: triggerElement,
-        container: controller.getRootDiv() ?? undefined,
-        classNameMapper: cm,
-        returnFocusTo: triggerElement,
-        title: controller.i18nName(I18nLabel.Overflow_Menu_Tooltip), // the menu's accessible name
-        items: menuItems,
-        onSelect: (item) => {
-            const idx = menuItems.indexOf(item);
-            if (idx >= 0) {
-                onSelect(items[idx]);
-            }
-        },
-        renderItem,
-        onClose: () => {
-            controller.showOverlayOnAllWindows(false);
-            onHidden?.();
-        },
+    let hidden = false;
+    const hide = () => {
+        if (hidden) {
+            return;
+        }
+        hidden = true;
+        controller.setState({ popupMenu: undefined });
+        controller.showOverlayOnAllWindows(false);
+        onHidden?.();
+    };
+
+    controller.setState({
+        popupMenu: (
+            <PopupMenu
+                key={"overflow-" + parentNode.getId()}
+                anchor={triggerElement.getBoundingClientRect()}
+                container={controller.getRootDiv() ?? undefined}
+                classNameMapper={cm}
+                returnFocusTo={triggerElement}
+                title={controller.i18nName(I18nLabel.Overflow_Menu_Tooltip)}
+                items={menuItems}
+                onSelect={(item) => {
+                    const idx = menuItems.indexOf(item);
+                    if (idx >= 0) {
+                        onSelect(items[idx]);
+                    }
+                }}
+                renderItem={renderItem}
+                onClose={hide}
+            />
+        ),
     });
+    return hide;
 }
 
 PopupMenu.displayName = "PopupMenu"; // name in react dev tools

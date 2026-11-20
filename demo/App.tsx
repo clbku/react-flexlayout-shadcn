@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   Braces,
   Check,
@@ -101,6 +101,14 @@ const VI_LABELS: Record<string, string> = {
   "flexlayout.ui.error.rendering.component.retry": "Thử lại",
 };
 
+const TabIconClass = createContext<string | null>(null);
+
+function TabLeading({ node }: { node: TabNode }) {
+  const className = useContext(TabIconClass);
+  if (!className) throw new Error("TabLeading must be rendered inside TabIconClass");
+  return tabIcon(node, className);
+}
+
 export default function App() {
   const history = useUndo(() => Model.fromJson(initialLayout));
   const model = history.model!;
@@ -129,7 +137,7 @@ export default function App() {
   const factory = useCallback((node: TabNode) => <DemoTab node={node} model={model} />, [model]);
 
   const renderTab = useCallback((node: TabNode, values: ITabRenderValues) => {
-    values.leading = tabIcon(node);
+    values.leading = <TabLeading node={node} />;
   }, []);
 
   const activeTab = model.getActiveTabset()?.getSelectedNode();
@@ -443,6 +451,7 @@ export default function App() {
 
       <main className="relative min-h-0 flex-1 p-2">
         <div className="relative h-full w-full overflow-hidden rounded-lg border border-border/70">
+          <TabIconClass.Provider value="size-3.5 shrink-0">
           <Layout
             ref={layoutRef}
             model={model}
@@ -458,6 +467,7 @@ export default function App() {
               </div>
             )}
           />
+          </TabIconClass.Provider>
         </div>
 
         {jsonOpen ? (

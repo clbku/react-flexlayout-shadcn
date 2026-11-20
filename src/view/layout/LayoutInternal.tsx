@@ -326,6 +326,7 @@ export const LayoutInternal = React.forwardRef<LayoutController, ILayoutInternal
                 {reorderedTabContents}
                 {floatingWindows}
                 {dragTabButtons}
+                {state.popupMenu}
             </div>
         </LayoutTooltipProvider>
     );

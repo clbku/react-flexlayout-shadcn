@@ -51,6 +51,7 @@ export interface ILayoutInternalState {
     layoutRedrawRevision: number;
     fullRedrawRevision: number;
     showHiddenBorder: DockLocation;
+    popupMenu?: React.ReactNode;
 }
 
 /** @internal */

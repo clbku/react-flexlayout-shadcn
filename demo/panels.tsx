@@ -790,8 +790,7 @@ function PlaceholderPanel({ node }: { node: TabNode }) {
   );
 }
 
-export function tabIcon(node: TabNode) {
-  const className = "size-3.5 shrink-0";
+export function tabIcon(node: TabNode, className: string) {
   switch (node.getComponent()) {
     case "files":
       return <Folder className={cn(className, "text-amber-500")} />;
