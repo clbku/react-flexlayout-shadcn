@@ -1,6 +1,6 @@
 {
   "name": "react-flexlayout-shadcn",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A multi-tab docking layout manager for React, ported from flexlayout-react and themed with shadcn/ui design tokens",
   "type": "module",
   "license": "MIT",

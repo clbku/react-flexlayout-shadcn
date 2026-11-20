@@ -504,7 +504,7 @@ export function showOverflowMenu(
                 }}
                 title={it.node.getHelpText()}
             >
-                <TabButtonStamp tabNode={it.node} controller={controller} />
+                <TabButtonStamp tabNode={it.node} controller={controller} className="gap-2" />
             </div>
         );
     };

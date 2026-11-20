@@ -8,6 +8,7 @@ import { cn } from "../lib/utils";
 export interface ITabButtonStampProps {
     tabNode: TabNode;
     controller: LayoutController;
+    className?: string;
 }
 
 /** @internal */
@@ -16,7 +17,7 @@ export const TabButtonStamp = (props: ITabButtonStampProps) => {
 
     const cm = controller.getClassName;
 
-    const classNames = cn("inline-flex box-border items-center gap-[0.3em] whitespace-nowrap", cm(CLASSES.FLEXLAYOUT__TAB_BUTTON_STAMP));
+    const classNames = cn("inline-flex box-border items-center gap-[0.3em] whitespace-nowrap", props.className, cm(CLASSES.FLEXLAYOUT__TAB_BUTTON_STAMP));
 
     const renderState = getRenderStateEx(controller, tabNode);
 
