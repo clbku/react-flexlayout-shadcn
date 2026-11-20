@@ -29,8 +29,8 @@ export interface ITabSetProps {
 }
 
 const TABBAR_LOCATION_CLASSES: Record<string, string> = {
-    top: "px-[2px] border-b border-b-[color:var(--fl-color-tabset-divider-line)]",
-    bottom: "px-[2px] border-t border-t-[color:var(--fl-color-tabset-divider-line)]",
+    top: "px-[2px] py-1 border-b border-b-[color:var(--fl-color-tabset-divider-line)]",
+    bottom: "px-[2px] py-1 border-t border-t-[color:var(--fl-color-tabset-divider-line)]",
 };
 
 const TAB_CONTAINER_LOCATION_CLASSES: Record<string, string> = {
