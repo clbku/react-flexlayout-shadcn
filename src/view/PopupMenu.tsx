@@ -130,6 +130,8 @@ export interface IPopupMenuProps {
     returnFocusTo?: HTMLElement;
     /** accessible label for the menu */
     title?: string;
+    /** extra classes for the menu surface, merged over the defaults */
+    contentClassName?: string;
 }
 
 /** @internal duck-type an element (cross-window/popout elements are not `instanceof` this realm's HTMLElement) */
@@ -296,10 +298,8 @@ export const PopupMenu = (props: IPopupMenuProps) => {
                     key={item.key}
                     asChild
                     disabled={item.disabled}
-                    className={itemClassName(item)}
+                    className={cn(itemClassName(item), React.isValidElement<{ className?: string }>(rendered) ? rendered.props.className : undefined)}
                     onSelect={(event: Event) => {
-                        // the custom body drives selection itself (it may contain its own controls);
-                        // Enter/Space on the item root still closes through the canonical select
                         event.preventDefault();
                         select(item);
                     }}
@@ -330,7 +330,7 @@ export const PopupMenu = (props: IPopupMenuProps) => {
         pointerEvents: "none",
     };
 
-    const contentClassName = cn(POPUP_CONTENT_CLASSES, cm(CLASSES.FLEXLAYOUT__POPUP_MENU_CONTAINER), cm(CLASSES.FLEXLAYOUT__POPUP_MENU));
+    const contentClassName = cn(POPUP_CONTENT_CLASSES, props.contentClassName, cm(CLASSES.FLEXLAYOUT__POPUP_MENU_CONTAINER), cm(CLASSES.FLEXLAYOUT__POPUP_MENU));
 
     const contentBehaviour = {
         onOpenAutoFocus: onMenuAutoFocus,
@@ -461,11 +461,11 @@ export function showOverflowMenu(
         const it = items[i];
         const group = it.node.getParent() instanceof TabGroupNode ? (it.node.getParent() as TabGroupNode) : undefined;
         const isGrouped = group !== undefined;
-        let classes = cn(POPUP_ITEM_CLASSES, cm(CLASSES.FLEXLAYOUT__POPUP_MENU_ITEM));
+        let classes = cn(POPUP_ITEM_CLASSES, "shrink-0 rounded-[4px] px-2 py-1.5", cm(CLASSES.FLEXLAYOUT__POPUP_MENU_ITEM));
         if (isGrouped) {
             classes = cn(
                 classes,
-                "rounded-none border-l-[5px] border-l-[color:var(--flexlayout-group-color)] pl-[calc(0.5em-5px)]",
+                "rounded-none border-l-[5px] border-l-[color:var(--flexlayout-group-color)] pl-[3px]",
                 cm(CLASSES.FLEXLAYOUT__POPUP_MENU_ITEM_GROUPED),
             );
         }
@@ -527,6 +527,7 @@ export function showOverflowMenu(
                 anchor={triggerElement.getBoundingClientRect()}
                 container={controller.getRootDiv() ?? undefined}
                 classNameMapper={cm}
+                contentClassName="gap-0.5 overflow-y-auto p-1"
                 returnFocusTo={triggerElement}
                 title={controller.i18nName(I18nLabel.Overflow_Menu_Tooltip)}
                 items={menuItems}
