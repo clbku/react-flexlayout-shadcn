@@ -113,7 +113,10 @@ export function detachDragNode(dragNode: Node, target: Node): { dragParent: Bord
     let fromIndex = 0;
     const dragParent = dragNode.getParent() as BorderNode | TabSetNode | RowNode | TabGroupNode | undefined;
     if (dragParent !== undefined) {
-        fromIndex = dragParent.removeChild(dragNode);
+        fromIndex =
+            dragParent instanceof RowNode && (dragNode instanceof RowNode || dragNode instanceof TabSetNode)
+                ? dragParent.removeChildKeepingSpace(dragNode)
+                : dragParent.removeChild(dragNode);
         if (dragNode instanceof TabGroupNode) {
             // a whole group left its container: repair the container's flat selection
             (dragParent as TabSetNode | BorderNode).repairSelected();

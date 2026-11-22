@@ -432,7 +432,7 @@ export class TabSetNode extends Node implements IDraggable, IDropTarget {
     /** @internal */
     delete() {
         const layoutId = this.getLayoutId();
-        (this.parent as RowNode).removeChild(this);
+        (this.parent as RowNode).removeChildKeepingSpace(this);
         if (this === this.model.getMaximizedTabset(layoutId)) {
             this.model.setMaximizedTabset(undefined, layoutId);
         }

@@ -255,6 +255,14 @@ export class RowNode extends Node implements IDropTarget {
     }
 
     /** @internal */
+    removeChildKeepingSpace(child: RowNode | TabSetNode) {
+        const pos = this.removeChild(child);
+        const neighbour = (this.children[pos] ?? this.children[pos - 1]) as RowNode | TabSetNode | undefined;
+        if (pos !== -1 && neighbour) neighbour.setWeight(neighbour.getWeight() + child.getWeight());
+        return pos;
+    }
+
+    /** @internal */
     getMinWidth() {
         return this.minWidth;
     }
@@ -324,7 +332,7 @@ export class RowNode extends Node implements IDropTarget {
 
                 const childChildren = child.getChildren();
                 if (childChildren.length === 0) {
-                    this.removeChild(child);
+                    this.removeChildKeepingSpace(child);
                 } else if (childChildren.length === 1) {
                     // hoist child/children up to this level
                     const subchild = childChildren[0];
@@ -353,7 +361,7 @@ export class RowNode extends Node implements IDropTarget {
                 }
             } else if (child instanceof TabSetNode && child.getChildren().length === 0) {
                 if (child.isEnableDeleteWhenEmpty() && child.isEnableClose()) {
-                    this.removeChild(child);
+                    this.removeChildKeepingSpace(child);
                     if (child === this.model.getMaximizedTabset(this.getLayoutId())) {
                         this.model.setMaximizedTabset(undefined, this.getLayoutId()!);
                     }
